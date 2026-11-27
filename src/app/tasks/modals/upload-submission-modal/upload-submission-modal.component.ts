@@ -5,9 +5,9 @@ import {Task} from 'src/app/api/models/task';
 import {TaskStatusEnum} from 'src/app/api/models/task-status';
 import {ProjectService} from 'src/app/api/services/project.service';
 import {TaskService} from 'src/app/api/services/task.service';
-import {FileUploaderComponent} from 'src/app/common/file-uploader/file-uploader.component';
 import {AlertService} from 'src/app/common/services/alert.service';
 import {EmojiService} from 'src/app/common/services/emoji.service';
+import {SubmissionFileUploadComponent} from 'src/app/common/submission-file-upload/submission-file-upload.component';
 import {PrivacyPolicy} from 'src/app/config/privacy-policy/privacy-policy';
 import {SubmissionRequestDeniedModalComponent} from '../submission-request-denied-modal/submission-request-denied-modal.component';
 
@@ -62,7 +62,7 @@ export type UploadSubmissionModalResult =
   standalone: false,
 })
 export class UploadSubmissionModalComponent implements OnInit {
-  @ViewChild(FileUploaderComponent) private fileUploader?: FileUploaderComponent;
+  @ViewChild(SubmissionFileUploadComponent) private fileUploader?: SubmissionFileUploadComponent;
 
   public readonly minCommentLength = 25;
   public readonly task = this.data.task;

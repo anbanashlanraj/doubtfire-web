@@ -60,8 +60,7 @@
           </div>
         }
 
-        <f-file-uploader
-          #fileUploader
+        <f-submission-file-upload
           [files]="fileRequirements"
           [onBeforeUpload]="onBeforeUpload"
           [onClickFailureCancel]="cancel"
@@ -69,14 +68,11 @@
           [onRequestDenied]="onRequestDenied"
           [onSuccess]="onUploadSuccess"
           [payload]="payload"
-          [resetAfterUpload]="false"
-          [showUploadButton]="false"
-          [singleDropZone]="true"
           [url]="uploadUrl"
           (isReadyChange)="onReadyChange($event)"
           (uploadReady)="onUploaderReady($event)"
         >
-        </f-file-uploader>
+        </f-submission-file-upload>
       </mat-card-content>
     </mat-card>
 
