@@ -244,6 +244,7 @@ import {SettingCheckboxComponent} from './common/setting-checkbox/setting-checkb
 import {SettingToggleComponent} from './common/setting-toggle/setting-toggle.component';
 import {StatusIconComponent} from './common/status-icon/status-icon.component';
 import {SubmissionFileStackComponent} from './common/submission-file-stack/submission-file-stack.component';
+import {SubmissionFileUploadComponent} from './common/submission-file-upload/submission-file-upload.component';
 import {SubmissionFilesDownloadComponent} from './common/submission-files-download/submission-files-download.component';
 import {SuccessCloseComponent} from './common/success-close/success-close.component';
 import {TaskFileViewerComponent} from './common/task-file-viewer/task-file-viewer.component';
@@ -716,6 +717,7 @@ const DEFAULT_TOOLTIP_OPTIONS: MatTooltipDefaultOptions = {
     GroupSelectorComponent,
     GroupSetManagerComponent,
     FileUploaderComponent,
+    SubmissionFileUploadComponent,
     PortfolioWelcomeStepComponent,
     PortfolioLearningSummaryReportStepComponent,
     PortfolioAddExtraFilesStepComponent,

@@ -1,0 +1,166 @@
+@if (!isUploading) {
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-between gap-2">
+      <span class="flex flex-wrap items-baseline gap-x-2">
+        <span class="text-gray-600">
+          {{ selectedCount }} of {{ rows.length }}
+          {{ rows.length === 1 ? 'file' : 'files' }} selected
+        </span>
+        <span class="text-sm text-gray-500">You can drop a file onto any row</span>
+      </span>
+      <button mat-button type="button" [disabled]="selectedCount === 0" (click)="clearAll()">
+        Clear all
+      </button>
+    </div>
+
+    @for (row of rows; track row.key) {
+      <div
+        class="flex items-center gap-2 rounded-lg border-2 px-2 py-1 transition-colors"
+        [class.bg-blue-50]="row.dragOver"
+        [class.border-blue-500]="row.dragOver"
+        [class.border-dashed]="!row.file"
+        [class.border-gray-200]="row.file && !row.dragOver && !row.invalid"
+        [class.border-gray-300]="!row.file && !row.dragOver && !row.invalid"
+        [class.border-red-400]="row.invalid && !row.dragOver"
+        (dragleave)="onDragLeave($event, row)"
+        (dragover)="onDragOver($event, row)"
+        (drop)="onFileDropped($event, row)"
+      >
+        <button
+          class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md p-1 text-left"
+          type="button"
+          [attr.aria-label]="(row.file ? 'Replace file for ' : 'Choose file for ') + row.name"
+          (click)="fileInput.click()"
+        >
+          <span class="relative shrink-0">
+            <span
+              class="flex size-12 items-center justify-center overflow-hidden rounded-md bg-gray-100"
+            >
+              @switch (thumbnailFor(row)) {
+                @case ('image') {
+                  <img
+                    alt=""
+                    class="size-full object-cover"
+                    [src]="row.previewUrl"
+                    (error)="onPreviewError(row)"
+                  />
+                }
+                @case ('pdf') {
+                  <mat-icon class="text-red-600">picture_as_pdf</mat-icon>
+                }
+                @case ('badge') {
+                  <span class="px-1 font-mono text-[11px] font-semibold text-gray-700 uppercase">
+                    {{ extensionLabel(row.file) }}
+                  </span>
+                }
+                @default {
+                  <mat-icon class="text-gray-500">{{ row.icon }}</mat-icon>
+                }
+              }
+            </span>
+            @if (row.file) {
+              <mat-icon
+                aria-hidden="true"
+                class="absolute -right-1.5 -bottom-1.5 size-[18px]! rounded-full bg-white text-[18px]! text-green-600"
+              >
+                check_circle
+              </mat-icon>
+            }
+          </span>
+
+          <span class="flex min-w-0 flex-col">
+            <span class="truncate font-medium text-gray-900" [matTooltip]="row.name">
+              {{ row.name }}
+            </span>
+            @if (row.invalid) {
+              <span class="text-sm text-red-600">
+                Invalid file. Accepts: {{ acceptedList(row) }}
+              </span>
+            } @else if (row.file) {
+              <span class="truncate text-sm text-gray-500">
+                {{ row.file.name }} · {{ formatSize(row.file.size) }}
+              </span>
+            } @else {
+              <span class="text-sm text-gray-500">{{ dropHint(row) }}</span>
+            }
+          </span>
+        </button>
+
+        <input
+          #fileInput
+          class="hidden"
+          type="file"
+          [accept]="row.accept"
+          (change)="onFileSelected($event, row)"
+        />
+
+        @if (row.file) {
+          <button
+            mat-icon-button
+            matTooltip="Replace file"
+            type="button"
+            [attr.aria-label]="'Replace file for ' + row.name"
+            (click)="fileInput.click()"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matTooltip="Remove file"
+            type="button"
+            [attr.aria-label]="'Remove file for ' + row.name"
+            (click)="removeFile(row)"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        } @else {
+          <button mat-stroked-button type="button" (click)="fileInput.click()">Choose file</button>
+        }
+      </div>
+    }
+  </div>
+} @else {
+  @if (!uploadingInfo?.complete) {
+    <div class="flex min-h-75 w-full flex-col items-center justify-center gap-3">
+      <div class="flex items-center justify-center gap-1">
+        @for (row of rows; track row.key) {
+          <mat-icon class="size-[75px]! text-[75px]!">{{ row.icon }}</mat-icon>
+        }
+        <mat-icon class="size-[75px]! text-[75px]!">arrow_right_alt</mat-icon>
+        <i class="logo size-[75px]"></i>
+      </div>
+
+      <mat-progress-bar mode="determinate" [value]="uploadingInfo?.progress ?? 0">
+      </mat-progress-bar>
+    </div>
+  } @else {
+    <div class="flex min-h-75 flex-col items-center justify-center gap-3">
+      <div class="flex w-full items-center justify-center gap-3">
+        <mat-icon
+          class="size-[50px]! text-[50px]!"
+          [color]="uploadingInfo.success ? 'primary' : 'warn'"
+        >
+          {{ uploadingInfo.success ? 'check_circle' : 'cancel' }}
+        </mat-icon>
+
+        <strong class="text-2xl">
+          File Upload {{ uploadingInfo.success ? 'Successful' : 'Failed' }}
+        </strong>
+      </div>
+
+      @if (!uploadingInfo.success) {
+        <div class="flex max-w-xl flex-col items-center justify-center">
+          <hr class="border-b border-gray-300" />
+          <p><strong>Error Message:</strong> {{ uploadingInfo.error }}</p>
+
+          <div class="flex gap-3">
+            <button color="primary" mat-button type="button" (click)="retryUpload()">
+              Retry Upload
+            </button>
+            <button mat-button type="button" (click)="cancelAfterFailure()">Cancel</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}
